@@ -68,14 +68,24 @@ class ConfigProfiles:
 
     def initialize_profile(self):
         self.ps.load()
-        print("Profile set to " + self.ps.current())
+        if os.path.exists(self.ps.current_path()):
+            print("Profile set to " + self.ps.current())
+        else:
+            print("Set profile not found, reverting to default")
+            self.ps.set_current("Default")
+
         shared.config_filename = self.ps.current_path()
-        opts.load(shared.config_filename)
+        if os.path.exists(self.ps.current_path()):
+            opts.load(shared.config_filename)
 
     def change_preview(self, profile):
-        configfile = []
-        with open(self.ps.profile_path(profile), 'r', encoding="utf8") as file:
-            configfile = json.load(file)
+        if os.path.exists(self.ps.profile_path(profile)):
+            with open(self.ps.profile_path(profile), 'r', encoding="utf8") as file:
+                configfile = json.load(file)
+        else:
+            configfile = {}
+            print("Current config not found!")
+            self.ps.remove(profile)
 
         return gr.Json.update(value=configfile)
 
@@ -86,15 +96,22 @@ class ConfigProfiles:
             profile_list = self.ps.list()
             cur_profile = self.ps.current()
         else:
-            profile_list = ["config.json"]
-            cur_profile = "config.json"
-
-        with open(self.ps.profile_path(cur_profile), 'r', encoding="utf8") as file:
-            configfile = json.load(file)
+            profile_list = {"Default": "config.json"}
+            cur_profile = "Default"
+        if os.path.exists(self.ps.current_path()):
+            with open(self.ps.current_path(), 'r', encoding="utf8") as file:
+                configfile = json.load(file)
+        else:
+            configfile = []
+            print("Current config not found!")
+            self.ps.remove(cur_profile)
+            profile_list = self.ps.list()
 
         with gr.Blocks(analytics_enabled=False) as tab:
             gr.Markdown("# Config Profiles ")
             gr.Markdown("### Current Profile: " + cur_profile)
+            gr.Markdown("Any settings you change in the settings tab or extensions you disable/enable will only apply to the active profile")
+
             with gr.Row():
                 with gr.Column(variant='panel', scale=2):
                     gr.Markdown("## Switch and inspect profiles ")

@@ -44,7 +44,17 @@ class ProfileState:
 
     def set_current(self, profile):
         self.data["profile"] = profile
+        self.save()
 
     def exists(self, profile):
         return profile in self.list()
+
+    def remove(self, profile):
+        if profile == "Default":
+            return
+
+        self.data["profile_list"].pop(profile)
+        if self.current() == profile:
+            self.set_current("Default")
+        self.save()
 
