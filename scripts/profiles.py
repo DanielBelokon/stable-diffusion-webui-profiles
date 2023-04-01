@@ -33,7 +33,7 @@ class ConfigProfiles:
         shared.state.interrupt()
         shared.state.need_restart = True
 
-    def profile_add(self, profile_name):
+    def profile_add(self, profile_name, image_output_dir=""):
         if profile_name == "":
             print("Config Name can't be empty")
         else:
@@ -47,7 +47,24 @@ class ConfigProfiles:
             else:
                 print("Found matching config file, added to profile index")
 
+        self.apply_overrides(profile_name, image_output_dir)
+
         return gr.Radio.update(choices=self.ps.list())
+
+    def apply_overrides(self, profile_name, image_output_dir):
+        if image_output_dir == "":
+            return
+
+        tmp_opts = shared.Options()
+        tmp_opts.load(self.ps.profile_path(profile_name))
+        # tmp_opts.outdir_samples = image_output_dir + "/images"
+        tmp_opts.outdir_txt2img_samples = image_output_dir + "/txt2img-images"
+        tmp_opts.outdir_img2img_samples = image_output_dir + "/img2img-images"
+        tmp_opts.outdir_extras_samples = image_output_dir + "/extras-images"
+        # tmp_opts.outdir_grids = image_output_dir + "/grids"
+        tmp_opts.outdir_txt2img_grids = image_output_dir + "/txt2img-grids"
+        tmp_opts.outdir_img2img_grids = image_output_dir + "/img2img-grids"
+        tmp_opts.save(self.ps.profile_path(profile_name))
 
     def initialize_profile(self):
         self.ps.load()
@@ -78,18 +95,22 @@ class ConfigProfiles:
         with gr.Blocks(analytics_enabled=False) as tab:
             gr.Markdown("# Config Profiles ")
             gr.Markdown("### Current Profile: " + cur_profile)
-            with gr.Column(variant='panel', scale=1):
-                with gr.Row(variant='panel').style(equal_height=True):
-                    with gr.Row():
+            with gr.Row():
+                with gr.Column(variant='panel', scale=2):
+                    gr.Markdown("## Switch and inspect profiles ")
+                    with gr.Row(variant='panel'):
                         profile_radio = gr.Radio(label="Profiles", choices=profile_list, value=cur_profile)
                         apply_profile = gr.Button("Apply", elem_id="profile_apply", variant='primary')
-                with gr.Row(variant='panel').style(equal_height=True):
-                    with gr.Row():
-                        new_profile_input = gr.Textbox("", placeholder="new-config.json", label="New Profile Name")
-                        # new_profile_base = gr.Radio(label="Profiles", choices=["Selected", "Current", "Default"], value="Current")
+                    gr.Markdown("## Add new profiles ")
+                    with gr.Row(variant='panel'):
+                        with gr.Row():
+                            new_profile_input = gr.Textbox("NewProfile", placeholder="new-config.json", label="New Profile Name")
+                            image_output = gr.Textbox("outputs", placeholder="Leave empty for current profile's dir",
+                                                      label="Profile's root Image outputs folder")
+
                         add_profile = gr.Button("Add", elem_id="profile_add")
-            with gr.Column(scale=3):
-                profile_display = gr.Json(value=configfile)
+                with gr.Column(variant='panel', scale=1):
+                    profile_display = gr.Json(value=configfile)
 
             apply_profile.click(
                 fn=self.profile_update,
@@ -100,7 +121,7 @@ class ConfigProfiles:
 
             add_profile.click(
                 fn=self.profile_add,
-                inputs=[new_profile_input],
+                inputs=[new_profile_input, image_output],
                 outputs=[profile_radio]
             )
 
