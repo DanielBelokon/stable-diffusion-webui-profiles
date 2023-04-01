@@ -50,7 +50,11 @@ class ProfileState:
         return profile in self.list()
 
     def remove(self, profile):
-        if profile == "Default":
+        if profile == "Default" or profile == self.current():
+            print("Can't delete default or active profile")
+            return
+
+        if profile not in self.list():
             return
 
         self.data["profile_list"].pop(profile)

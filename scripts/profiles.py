@@ -51,17 +51,21 @@ class ConfigProfiles:
 
         return gr.Radio.update(choices=self.ps.list())
 
+    def profile_delete(self, profile_name):
+        self.ps.remove(profile_name)
+        return gr.Radio.update(choices=self.ps.list()), gr.Radio.update(choices=self.ps.list(), value=None)
+
     def apply_overrides(self, profile_name, image_output_dir):
         if image_output_dir == "":
             return
 
         tmp_opts = shared.Options()
         tmp_opts.load(self.ps.profile_path(profile_name))
-        # tmp_opts.outdir_samples = image_output_dir + "/images"
+        tmp_opts.outdir_samples = "" if tmp_opts.outdir_samples == "" else image_output_dir + "/images"
         tmp_opts.outdir_txt2img_samples = image_output_dir + "/txt2img-images"
         tmp_opts.outdir_img2img_samples = image_output_dir + "/img2img-images"
         tmp_opts.outdir_extras_samples = image_output_dir + "/extras-images"
-        # tmp_opts.outdir_grids = image_output_dir + "/grids"
+        tmp_opts.outdir_grids = "" if tmp_opts.outdir_grids == "" else image_output_dir + "/grids"
         tmp_opts.outdir_txt2img_grids = image_output_dir + "/txt2img-grids"
         tmp_opts.outdir_img2img_grids = image_output_dir + "/img2img-grids"
         tmp_opts.save(self.ps.profile_path(profile_name))
@@ -126,6 +130,12 @@ class ConfigProfiles:
                                                       label="Profile's root Image outputs folder")
 
                         add_profile = gr.Button("Add", elem_id="profile_add")
+
+                    with gr.Row(variant='panel'):
+                        with gr.Accordion(label="Delete Profiles", open=False):
+                            delete_profile_radio = gr.Radio(label="Profiles", choices=profile_list)
+                            delete_profile_button = gr.Button("DELETE", elem_id="profile_delete", variant='stop')
+
                 with gr.Column(variant='panel', scale=1):
                     profile_display = gr.Json(value=configfile)
 
@@ -142,7 +152,13 @@ class ConfigProfiles:
                 outputs=[profile_radio]
             )
 
-            profile_radio.change(fn=self.change_preview, inputs=profile_radio, outputs=profile_display)
+            delete_profile_button.click(
+                fn=self.profile_delete,
+                inputs=delete_profile_radio,
+                outputs=[profile_radio, delete_profile_radio]
+            )
+
+            profile_radio.select(fn=self.change_preview, inputs=profile_radio, outputs=profile_display)
 
         return [(tab, "Profiles", "profiles")]
 
