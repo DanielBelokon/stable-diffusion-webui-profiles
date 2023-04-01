@@ -81,6 +81,8 @@ class ConfigProfiles:
         shared.config_filename = self.ps.current_path()
         if os.path.exists(self.ps.current_path()):
             opts.load(shared.config_filename)
+        else:
+            opts.save(self.ps.current_path())
 
     def change_preview(self, profile):
         if os.path.exists(self.ps.profile_path(profile)):
