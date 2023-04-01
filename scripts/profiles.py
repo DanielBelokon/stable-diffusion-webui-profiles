@@ -117,7 +117,7 @@ class ConfigProfiles:
             gr.Markdown("Any settings you change in the settings tab or extensions you disable/enable will only apply to the active profile")
 
             with gr.Row():
-                with gr.Column(variant='panel', scale=2):
+                with gr.Column(scale=2):
                     gr.Markdown("## Switch and inspect profiles ")
                     with gr.Row(variant='panel'):
                         profile_radio = gr.Radio(label="Profiles", choices=profile_list, value=cur_profile)
