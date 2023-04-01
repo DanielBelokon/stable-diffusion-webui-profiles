@@ -1,3 +1,4 @@
 .idea
 __pycache__/
-profile_settings.json
+profiles_state.json
+profiles/

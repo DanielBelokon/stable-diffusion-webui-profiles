@@ -37,12 +37,15 @@ class ConfigProfiles:
         if profile_name == "":
             print("Config Name can't be empty")
         else:
-            if not os.path.exists(profile_name):
-                opts.save(profile_name)
+            if not self.ps.exists(profile_name):
+                self.ps.add(profile_name)
             else:
-                print("Found existing profile, updating list...")
+                print("Profile already exists")
 
-            self.ps.add(profile_name)
+            if not os.path.exists(self.ps.profile_path(profile_name)):
+                opts.save(self.ps.profile_path(profile_name))
+            else:
+                print("Found matching config file, added to profile index")
 
         return gr.Radio.update(choices=self.ps.list())
 
@@ -54,7 +57,7 @@ class ConfigProfiles:
 
     def change_preview(self, profile):
         configfile = []
-        with open(profile, 'r', encoding="utf8") as file:
+        with open(self.ps.profile_path(profile), 'r', encoding="utf8") as file:
             configfile = json.load(file)
 
         return gr.Json.update(value=configfile)

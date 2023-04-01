@@ -1,11 +1,17 @@
-import modules
+import modules.scripts
 import os
 import json
 
 
 class ProfileState:
-    settings_path = os.path.join(modules.scripts.basedir(), "profiles_settings.json")
-    data = {"profile": "config.json", "profile_list": ["config.json"]}
+    settings_path = os.path.join(modules.scripts.basedir(), "profiles_state.json")
+    profiles_dir_path = os.path.join(modules.scripts.basedir(), "profiles")
+    data = {
+            "profile": "Default",
+            "profile_list": {
+                        "Default": "config.json"
+                    }
+    }
 
     def save(self):
         with open(self.settings_path, 'w') as ps_fd:
@@ -17,14 +23,17 @@ class ProfileState:
                 self.data = json.load(ps_fd)
 
     def profile_path(self, profile):
-        return profile
+        return self.data["profile_list"][profile]
 
     def list(self):
-        return self.data["profile_list"]
+        return list(self.data["profile_list"].keys())
 
     def add(self, profile_name):
         if profile_name not in self.data["profile_list"]:
-            self.data["profile_list"].append(profile_name)
+            if not os.path.exists(self.profiles_dir_path):
+                os.mkdir(self.profiles_dir_path)
+
+            self.data["profile_list"][profile_name] = os.path.join(self.profiles_dir_path, profile_name + ".json")
             self.save()
 
     def current(self):
@@ -35,4 +44,7 @@ class ProfileState:
 
     def set_current(self, profile):
         self.data["profile"] = profile
+
+    def exists(self, profile):
+        return profile in self.list()
 
