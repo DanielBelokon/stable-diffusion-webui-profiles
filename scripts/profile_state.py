@@ -56,8 +56,10 @@ class ProfileState:
 
         if profile not in self.list():
             return
-
+        path = self.profile_path(profile)
         self.data["profile_list"].pop(profile)
+        print("Deleting " + path)
+        os.remove(path)
         if self.current() == profile:
             self.set_current("Default")
         self.save()

@@ -49,7 +49,7 @@ class ConfigProfiles:
 
         self.apply_overrides(profile_name, image_output_dir)
 
-        return gr.Radio.update(choices=self.ps.list())
+        return gr.Radio.update(choices=self.ps.list()), gr.Radio.update(choices=self.ps.list())
 
     def profile_delete(self, profile_name):
         self.ps.remove(profile_name)
@@ -149,7 +149,7 @@ class ConfigProfiles:
             add_profile.click(
                 fn=self.profile_add,
                 inputs=[new_profile_input, image_output],
-                outputs=[profile_radio]
+                outputs=[profile_radio, delete_profile_radio]
             )
 
             delete_profile_button.click(
