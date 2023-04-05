@@ -8,4 +8,5 @@ and other important configurations being stored in the... well, config file, thi
 e.g. have a sfw profile with the nsfw-censor extension enabled, 
 and a separate output directory so other images aren't visible in image-viewer, etc.
 
-![image](https://user-images.githubusercontent.com/12982054/229304673-d1457c7d-346f-4bc9-8328-cdbf0d811c70.png)
+![image](https://user-images.githubusercontent.com/12982054/230087527-e1106c85-8169-4251-b4ec-debc68aaf132.png)
+
