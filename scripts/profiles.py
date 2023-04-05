@@ -160,7 +160,7 @@ class ConfigProfiles:
                 outputs=[profile_radio, delete_profile_radio]
             )
 
-            profile_radio.select(fn=self.change_preview, inputs=profile_radio, outputs=profile_display)
+            profile_radio.change(fn=self.change_preview, inputs=profile_radio, outputs=profile_display)
 
         return [(tab, "Profiles", "profiles")]
 
