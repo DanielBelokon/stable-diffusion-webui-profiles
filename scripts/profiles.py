@@ -91,7 +91,6 @@ class ConfigProfiles:
         self.display_options.save(self.ps.profile_path(profile))
 
     def set_display_setting(self, key, value):
-        print("changed" + str(key) + " to " + str(value))
         self.display_options.set(key, value)
 
     def create_settings_display(self):
