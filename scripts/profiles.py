@@ -28,9 +28,12 @@ class ConfigProfiles:
 
         self.ps.save()
 
-        # Restart webui
-        shared.state.interrupt()
-        shared.state.need_restart = True
+        # Restart webui (should work on vlad's auto)
+        try:
+            shared.restart_server(restart=True)
+        except:
+            shared.state.need_restart = True
+            shared.state.interrupt()
 
     def profile_add(self, profile_name, image_output_dir=""):
         if profile_name == "":
